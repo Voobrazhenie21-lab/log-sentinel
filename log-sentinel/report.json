@@ -1,0 +1,56 @@
+[
+  {
+    "rule": "ssh-brute-force-success",
+    "severity": "CRITICAL",
+    "title": "ВОЗМОЖНАЯ КОМПРОМЕТАЦИЯ: успешный вход «deploy» с атакующего 45.148.10.87 (Sep  3 10:14:55)",
+    "evidence": [
+      "Sep  3 10:14:55 — Accepted password for deploy from 45.148.10.87"
+    ],
+    "recommendation": "Немедленно сбросить пароль учётной записи, проверить сессии и следы постэксплуатации на хосте."
+  },
+  {
+    "rule": "ssh-brute-force",
+    "severity": "HIGH",
+    "title": "SSH-брутфорс с 45.148.10.87: 14 неудачных попыток",
+    "evidence": [
+      "Sep  3 10:10:10 — пользователь «root»",
+      "Sep  3 10:10:11 — пользователь «admin»",
+      "Sep  3 10:10:12 — пользователь «test»",
+      "Sep  3 10:10:13 — пользователь «oracle»",
+      "Sep  3 10:10:14 — пользователь «postgres»",
+      "Sep  3 10:10:15 — пользователь «root»",
+      "Sep  3 10:10:16 — пользователь «root»",
+      "Sep  3 10:10:17 — пользователь «admin»",
+      "Sep  3 10:10:18 — пользователь «user»",
+      "Sep  3 10:10:19 — пользователь «deploy»"
+    ],
+    "recommendation": "Заблокировать IP на фаерволе / в Fail2ban, проверить отсутствие успешных входов с этого адреса."
+  },
+  {
+    "rule": "password-spraying",
+    "severity": "HIGH",
+    "title": "Password spraying с 10.0.30.55: подбор к 6 учётным записям",
+    "evidence": [
+      "Целевые учётки: ivanov, kuznecov, petrov, popov, sidorov, smirnov"
+    ],
+    "recommendation": "Проверить политику блокировки, расследовать источник, принудительно сменить пароли затронутых учёток."
+  },
+  {
+    "rule": "kerberoasting",
+    "severity": "HIGH",
+    "title": "Признаки Kerberoasting: 2 TGS с RC4 (событие 4769)",
+    "evidence": [
+      "Сервисные учётки: HTTP/web01.lab.local, MSSQLSvc/dc01.lab.local"
+    ],
+    "recommendation": "Проверить, кто запрашивал билеты; сменить пароли сервисных учёток; перевести их на AES (msDS-SupportedEncryptionTypes)."
+  },
+  {
+    "rule": "account-brute-force",
+    "severity": "MEDIUM",
+    "title": "Брутфорс учётной записи «admin_temp»: 12 неудачных входов (4625)",
+    "evidence": [
+      "EventID 4625 × 12"
+    ],
+    "recommendation": "Проверить блокировку учётной записи и источник попыток."
+  }
+]
