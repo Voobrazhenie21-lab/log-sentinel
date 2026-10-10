@@ -1,0 +1,9 @@
+Apr 18 12:35:01 web-server sshd[2104]: Failed password for invalid user admin from 10.0.10.254 port 49112 ssh2
+Apr 18 12:35:04 web-server sshd[2106]: Failed password for root from 10.0.10.254 port 49118 ssh2
+Apr 18 12:35:07 web-server sshd[2109]: Failed password for root from 10.0.10.254 port 49124 ssh2
+Apr 18 12:35:10 web-server sshd[2112]: Failed password for user1 from 10.0.10.254 port 49130 ssh2
+Apr 18 12:35:13 web-server sshd[2115]: Failed password for root from 10.0.10.254 port 49136 ssh2
+Apr 18 12:52:09 web-server sshd[2341]: Accepted publickey for root from 10.0.10.254 port 50214 ssh2: RSA SHA256:kali@kali
+Apr 19 08:11:18 web-server sshd[4102]: Accepted publickey for root from 10.0.10.254 port 54110 ssh2: RSA SHA256:kali@kali
+Apr 19 10:15:09 web-server systemd[1]: Stopping Wazuh agent...
+Apr 19 10:15:10 web-server wazuh-agent[1120]: Stopped Wazuh agent (Rule 506).

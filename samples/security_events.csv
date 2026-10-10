@@ -1,0 +1,7 @@
+EventID,TimeCreated,TargetUserName,IpAddress,ServiceName,TicketEncryptionType
+4625,2023-04-18 12:50:12,ivanov,10.0.30.55,,
+4625,2023-04-18 12:50:12,petrov,10.0.30.55,,
+4625,2023-04-18 12:50:12,sidorov,10.0.30.55,,
+4625,2023-04-18 12:50:12,smirnov,10.0.30.55,,
+4625,2023-04-18 12:50:12,kuznecov,10.0.30.55,,
+4625,2023-04-18 12:50:12,popov,10.0.30.55,,

@@ -1,0 +1,234 @@
+{
+  "tool": "Log Sentinel",
+  "version": "1.2.0",
+  "generated_at": "2026-10-10T13:55:06Z",
+  "summary": {
+    "total_events_parsed": 34,
+    "total_alerts_triggered": 9,
+    "severity_breakdown": {
+      "CRITICAL": 6,
+      "HIGH": 3,
+      "MEDIUM": 0,
+      "LOW": 0
+    }
+  },
+  "alerts": [
+    {
+      "rule_id": "LS-RULE-001",
+      "title": "Web Shell Upload & Execution Detected (DVWA / Unrestricted Upload)",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Persistence / Initial Access",
+      "mitre_technique": "T1505.003 (Server Software Component: Web Shell)",
+      "host": "web-server",
+      "source_ip": "10.0.10.254",
+      "target_user": "root / www-data",
+      "timestamp_first": "18/Apr/2023:12:43:00 +0000",
+      "timestamp_last": "18/Apr/2023:12:51:40 +0000",
+      "event_count": 3,
+      "description": "Detected 3 HTTP requests indicating upload and execution of a PHP web shell (e.g. backdoor.php) from 10.0.10.254 on web-server.",
+      "evidence": [
+        "10.0.10.254 - - [18/Apr/2023:12:43:00 +0000] \"GET /hackable/uploads/backdoor.php HTTP/1.1\" 200 13585",
+        "10.0.10.254 - - [18/Apr/2023:12:44:12 +0000] \"POST /hackable/uploads/backdoor.php HTTP/1.1\" 200 4820",
+        "10.0.10.254 - - [18/Apr/2023:12:51:40 +0000] \"POST /hackable/uploads/backdoor.php HTTP/1.1\" 200 2190"
+      ],
+      "remediation": [
+        "Isolate the web server and remove malicious PHP scripts from the uploads directory.",
+        "Ensure Apache is NOT compiled with -DBIG_SECURITY_HOLE and does not run as root.",
+        "Disable PHP execution (php_flag engine off) inside user upload directories."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 31106 / 550 (FIM Webshell)"
+    },
+    {
+      "rule_id": "LS-RULE-002",
+      "title": "SSH Brute-Force Followed by Successful Login",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Credential Access / Initial Access",
+      "mitre_technique": "T1110.001 (Password Guessing)",
+      "host": "web-server",
+      "source_ip": "10.0.10.254",
+      "target_user": "admin, root, user1",
+      "timestamp_first": "Apr 18 12:35:01",
+      "timestamp_last": "Apr 19 08:11:18",
+      "event_count": 7,
+      "description": "Detected 5 failed SSH login attempts from 10.0.10.254 against web-server, followed by 2 successful login(s).",
+      "evidence": [
+        "Apr 18 12:35:01 web-server sshd[2104]: Failed password for invalid user admin from 10.0.10.254 port 49112 ssh2",
+        "Apr 18 12:35:04 web-server sshd[2106]: Failed password for root from 10.0.10.254 port 49118 ssh2",
+        "Apr 18 12:35:07 web-server sshd[2109]: Failed password for root from 10.0.10.254 port 49124 ssh2",
+        "Apr 18 12:52:09 web-server sshd[2341]: Accepted publickey for root from 10.0.10.254 port 50214 ssh2: RSA SHA256:kali@kali",
+        "Apr 19 08:11:18 web-server sshd[4102]: Accepted publickey for root from 10.0.10.254 port 54110 ssh2: RSA SHA256:kali@kali"
+      ],
+      "remediation": [
+        "Block the offending source IP via firewall / Fail2ban.",
+        "Audit /root/.ssh/authorized_keys for unauthorized SSH keys (e.g. kali@kali).",
+        "Disable PermitRootLogin in /etc/ssh/sshd_config."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 5712 / 5720"
+    },
+    {
+      "rule_id": "LS-RULE-003",
+      "title": "Windows RDP/Network Brute-Force Attack (Event ID 4625 -> 4624)",
+      "severity": "HIGH",
+      "mitre_tactic": "Credential Access / Lateral Movement",
+      "mitre_technique": "T1110.001 (Password Guessing) / T1021.001 (RDP)",
+      "host": "windows-host",
+      "source_ip": "10.0.30.55",
+      "target_user": "ivanov, kuznecov, petrov, popov, sidorov, smirnov",
+      "timestamp_first": "2023-04-18 12:50:12",
+      "timestamp_last": "2023-04-18 12:50:12",
+      "event_count": 6,
+      "description": "Detected 6 failed Windows logon attempts (Event ID 4625) from 10.0.30.55 (WorkstationName: unknown) on windows-host.",
+      "evidence": [
+        "{\"EventID\": \"4625\", \"TimeCreated\": \"2023-04-18 12:50:12\", \"TargetUserName\": \"ivanov\", \"IpAddress\": \"10.0.30.55\", \"ServiceName\": \"\", \"TicketEncryptionType\": \"\"}",
+        "{\"EventID\": \"4625\", \"TimeCreated\": \"2023-04-18 12:50:12\", \"TargetUserName\": \"petrov\", \"IpAddress\": \"10.0.30.55\", \"ServiceName\": \"\", \"TicketEncryptionType\": \"\"}",
+        "{\"EventID\": \"4625\", \"TimeCreated\": \"2023-04-18 12:50:12\", \"TargetUserName\": \"sidorov\", \"IpAddress\": \"10.0.30.55\", \"ServiceName\": \"\", \"TicketEncryptionType\": \"\"}"
+      ],
+      "remediation": [
+        "Enforce Account Lockout Policy in Active Directory GPO.",
+        "Restrict RDP access by IP and require Network Level Authentication (NLA) + MFA.",
+        "Rotate compromised user credentials immediately."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 60204 (Multiple Windows Logon Failures)"
+    },
+    {
+      "rule_id": "LS-RULE-003",
+      "title": "Windows RDP/Network Brute-Force Attack (Event ID 4625 -> 4624)",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Credential Access / Lateral Movement",
+      "mitre_technique": "T1110.001 (Password Guessing) / T1021.001 (RDP)",
+      "host": "ws01.acme.skb",
+      "source_ip": "10.0.10.5",
+      "target_user": "user1",
+      "timestamp_first": "2023-04-18T12:55:27Z",
+      "timestamp_last": "2023-04-18T12:55:35Z",
+      "event_count": 6,
+      "description": "Detected 5 failed Windows logon attempts (Event ID 4625) from 10.0.10.5 (WorkstationName: kali) on ws01.acme.skb, followed by 1 successful logon(s) (Event ID 4624).",
+      "evidence": [
+        "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 1/28)",
+        "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 6/28)",
+        "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 12/28)",
+        "An account was successfully logged on via RDP (LogonType 10). Account: ACME\\user1, Source IP: 10.0.10.5 (SSH Tunnel from kali)"
+      ],
+      "remediation": [
+        "Enforce Account Lockout Policy in Active Directory GPO.",
+        "Restrict RDP access by IP and require Network Level Authentication (NLA) + MFA.",
+        "Rotate compromised user credentials immediately."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 60204 (Multiple Windows Logon Failures)"
+    },
+    {
+      "rule_id": "LS-RULE-004",
+      "title": "Kerberoasting Attack Detected (RC4-HMAC TGS Request - Event ID 4769)",
+      "severity": "HIGH",
+      "mitre_tactic": "Credential Access",
+      "mitre_technique": "T1558.003 (Steal or Forge Kerberos Tickets: Kerberoasting)",
+      "host": "dc01.acme.skb",
+      "source_ip": "10.0.30.53",
+      "target_user": "mssql_svc",
+      "timestamp_first": "2023-04-19T09:20:00Z",
+      "timestamp_last": "2023-04-19T09:20:00Z",
+      "event_count": 1,
+      "description": "Detected 1 Kerberos TGS ticket request(s) (Event ID 4769) using legacy RC4-HMAC encryption (0x17) targeting service accounts for offline cracking.",
+      "evidence": [
+        "A Kerberos service ticket was requested (Event ID 4769). Service Name: mssql_svc, Ticket Encryption Type: 0x17 (RC4-HMAC), Client Address: 10.0.30.53"
+      ],
+      "remediation": [
+        "Migrate service accounts to Group Managed Service Accounts (gMSA) with 240-char passwords.",
+        "Enforce AES128/AES256 Kerberos encryption and disable RC4-HMAC in Domain Policy."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 60115 / Custom Kerberoasting Rule"
+    },
+    {
+      "rule_id": "LS-RULE-005",
+      "title": "Pass-the-Hash (PtH) Lateral Movement Detected (Event ID 4624 NTLM)",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Lateral Movement / Defense Evasion",
+      "mitre_technique": "T1550.002 (Use Alternate Authentication Material: Pass the Hash)",
+      "host": "dc01.acme.skb",
+      "source_ip": "10.0.30.53",
+      "target_user": "domainadmin",
+      "timestamp_first": "2023-04-19T09:34:29Z",
+      "timestamp_last": "2023-04-19T09:34:29Z",
+      "event_count": 1,
+      "description": "Detected 1 NTLM network logon(s) (LogonType 3, NtLmSsp, KeyLength=0) to dc01.acme.skb as 'domainadmin' from 10.0.30.53, characteristic of Pass-the-Hash.",
+      "evidence": [
+        "Pass-the-Hash detected (Wazuh Rule 92652): Account domainadmin logged on to dc01.acme.skb from 10.0.30.53 using NTLM (LogonType 3, NtLmSsp, KeyLength=0)."
+      ],
+      "remediation": [
+        "Add privileged accounts to the Active Directory 'Protected Users' security group.",
+        "Enable Windows Defender Credential Guard (LSA Protection / RunAsPPL) on all domain hosts.",
+        "Reset KRBTGT and privileged domain account passwords twice."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 92652 (Pass-the-Hash Activity)"
+    },
+    {
+      "rule_id": "LS-RULE-006",
+      "title": "Security Monitoring / Windows Defender Tampering Detected",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Defense Evasion",
+      "mitre_technique": "T1562.001 (Impair Defenses: Disable or Modify Tools)",
+      "host": "web-server",
+      "source_ip": "local",
+      "target_user": "root",
+      "timestamp_first": "Apr 19 10:15:09",
+      "timestamp_last": "2023-04-19T08:13:45Z",
+      "event_count": 3,
+      "description": "Detected disabling of Microsoft Defender Real-Time Protection (Event ID 5001/5007) and/or termination of the Wazuh SIEM agent service.",
+      "evidence": [
+        "Apr 19 10:15:09 web-server systemd[1]: Stopping Wazuh agent...",
+        "Apr 19 10:15:10 web-server wazuh-agent[1120]: Stopped Wazuh agent (Rule 506).",
+        "Microsoft Defender Antivirus Real-Time Protection scanning for malware and other potentially unwanted software was disabled."
+      ],
+      "remediation": [
+        "Enable Tamper Protection in Microsoft Defender and enforce settings via GPO.",
+        "Configure immediate high-priority SOC escalation on Wazuh Rule 506 (Agent stopped)."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 62152 / Rule 506"
+    },
+    {
+      "rule_id": "LS-RULE-007",
+      "title": "Forensic Artifact: Deleted LPE Exploit Detected via WER AppCrash",
+      "severity": "HIGH",
+      "mitre_tactic": "Privilege Escalation / Defense Evasion",
+      "mitre_technique": "T1068 (Exploitation for Privilege Escalation) / T1070.004 (File Deletion)",
+      "host": "ws01.acme.skb",
+      "source_ip": "local",
+      "target_user": "user1",
+      "timestamp_first": "2023-04-19T08:40:12Z",
+      "timestamp_last": "2023-04-19T08:40:12Z",
+      "event_count": 1,
+      "description": "Windows Error Reporting (WER Event ID 1001) recorded an application crash matching a known privilege escalation exploit (e.g. CVE-2019-0623.exe), proving execution even if the attacker subsequently deleted the binary.",
+      "evidence": [
+        "Fault bucket, type 0. Event Name: APPCRASH. Application Name: CVE-2019-0623.exe. Report archive: C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\AppCrash_CVE-2019-0623.ex_8051a89bf9be3b7c258b25fbbf6b2aa10ef12a6_5625ce51_068f0915-7e50-45f3-b91e-2662535e4f58"
+      ],
+      "remediation": [
+        "Preserve C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\ for forensic analysis.",
+        "Apply cumulative Windows kernel security updates (Win32k LPE patches)."
+      ],
+      "wazuh_rule_equivalent": "Forensic WER Artifact Correlation"
+    },
+    {
+      "rule_id": "LS-RULE-008",
+      "title": "Malware / Mimikatz Execution via Redirected RDP Drive (\\\\tsclient)",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Credential Access / Execution",
+      "mitre_technique": "T1003.001 (LSASS Memory) / T1021.001 (RDP Drive Redirection)",
+      "host": "ws01.acme.skb",
+      "source_ip": "local",
+      "target_user": "user1",
+      "timestamp_first": "2023-04-19T09:11:02Z",
+      "timestamp_last": "2023-04-19T09:11:30Z",
+      "event_count": 2,
+      "description": "Microsoft Defender logged 2 malware/hacktool detection(s) (including HackTool:Win32/Mimikatz.D and Trojan:Win32/Sabsik.TE.A!ml). UNC path analysis reveals execution directly from an attacker-mounted RDP shared drive (\\\\tsclient\\...), exposing the attacker host filesystem.",
+      "evidence": [
+        "Microsoft Defender Antivirus has detected malware: Trojan:Win32/Sabsik.TE.A!ml. Path: file:_C:\\Users\\Public\\Documents\\CVEs\\cve-2019-1458.exe",
+        "Microsoft Defender Antivirus has detected malware or potentially unwanted software: HackTool:Win32/Mimikatz.D. Path: file:_\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe"
+      ],
+      "remediation": [
+        "Disable RDP Drive Redirection via GPO (Do not allow drive redirection).",
+        "Isolate affected workstation and rotate all domain credentials cached in LSASS."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 62123 / Defender Malware Alert"
+    }
+  ]
+}

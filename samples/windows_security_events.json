@@ -1,0 +1,135 @@
+[
+  {
+    "TimeCreated": "2023-04-18T12:55:27Z",
+    "EventID": 4625,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 3,
+    "Status": "0xC000006D",
+    "Message": "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 1/28)"
+  },
+  {
+    "TimeCreated": "2023-04-18T12:55:28Z",
+    "EventID": 4625,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 3,
+    "Status": "0xC000006D",
+    "Message": "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 6/28)"
+  },
+  {
+    "TimeCreated": "2023-04-18T12:55:30Z",
+    "EventID": 4625,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 3,
+    "Status": "0xC000006D",
+    "Message": "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 12/28)"
+  },
+  {
+    "TimeCreated": "2023-04-18T12:55:32Z",
+    "EventID": 4625,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 3,
+    "Status": "0xC000006D",
+    "Message": "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 20/28)"
+  },
+  {
+    "TimeCreated": "2023-04-18T12:55:34Z",
+    "EventID": 4625,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 3,
+    "Status": "0xC000006D",
+    "Message": "An account failed to log on. Account: user1, Source Network Address: 10.0.10.5, Workstation Name: kali (Brute-RDP.py attempt 28/28)"
+  },
+  {
+    "TimeCreated": "2023-04-18T12:55:35Z",
+    "EventID": 4624,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1",
+    "IpAddress": "10.0.10.5",
+    "WorkstationName": "kali",
+    "LogonType": 10,
+    "AuthenticationPackageName": "Negotiate",
+    "Message": "An account was successfully logged on via RDP (LogonType 10). Account: ACME\\user1, Source IP: 10.0.10.5 (SSH Tunnel from kali)"
+  },
+  {
+    "TimeCreated": "2023-04-19T08:13:45Z",
+    "EventID": 5001,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Microsoft-Windows-Windows Defender/Operational",
+    "TargetUserName": "user1",
+    "IpAddress": "local",
+    "Message": "Microsoft Defender Antivirus Real-Time Protection scanning for malware and other potentially unwanted software was disabled."
+  },
+  {
+    "TimeCreated": "2023-04-19T08:40:12Z",
+    "EventID": 1001,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Application (Windows Error Reporting)",
+    "TargetUserName": "user1",
+    "IpAddress": "local",
+    "Message": "Fault bucket, type 0. Event Name: APPCRASH. Application Name: CVE-2019-0623.exe. Report archive: C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\AppCrash_CVE-2019-0623.ex_8051a89bf9be3b7c258b25fbbf6b2aa10ef12a6_5625ce51_068f0915-7e50-45f3-b91e-2662535e4f58"
+  },
+  {
+    "TimeCreated": "2023-04-19T09:11:02Z",
+    "EventID": 1116,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Microsoft-Windows-Windows Defender/Operational",
+    "TargetUserName": "user1",
+    "IpAddress": "local",
+    "Message": "Microsoft Defender Antivirus has detected malware: Trojan:Win32/Sabsik.TE.A!ml. Path: file:_C:\\Users\\Public\\Documents\\CVEs\\cve-2019-1458.exe"
+  },
+  {
+    "TimeCreated": "2023-04-19T09:11:30Z",
+    "EventID": 1116,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Microsoft-Windows-Windows Defender/Operational",
+    "TargetUserName": "SYSTEM",
+    "IpAddress": "10.0.10.254",
+    "Message": "Microsoft Defender Antivirus has detected malware or potentially unwanted software: HackTool:Win32/Mimikatz.D. Path: file:_\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe"
+  },
+  {
+    "TimeCreated": "2023-04-19T09:20:00Z",
+    "EventID": 4769,
+    "Computer": "dc01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "user1@ACME.SKB",
+    "ServiceName": "mssql_svc",
+    "TicketEncryptionType": "0x17",
+    "IpAddress": "10.0.30.53",
+    "Message": "A Kerberos service ticket was requested (Event ID 4769). Service Name: mssql_svc, Ticket Encryption Type: 0x17 (RC4-HMAC), Client Address: 10.0.30.53"
+  },
+  {
+    "TimeCreated": "2023-04-19T09:34:29Z",
+    "EventID": 4624,
+    "Computer": "dc01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "domainadmin",
+    "IpAddress": "10.0.30.53",
+    "WorkstationName": "ws01",
+    "LogonType": 3,
+    "AuthenticationPackageName": "NTLM",
+    "LogonProcessName": "NtLmSsp",
+    "KeyLength": 0,
+    "Message": "Pass-the-Hash detected (Wazuh Rule 92652): Account domainadmin logged on to dc01.acme.skb from 10.0.30.53 using NTLM (LogonType 3, NtLmSsp, KeyLength=0)."
+  }
+]
