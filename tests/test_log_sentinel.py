@@ -65,16 +65,47 @@ def test_detect_pass_the_hash_and_kerberoasting() -> None:
     assert "LS-RULE-005" in rule_ids  # Pass-the-Hash
 
 
+def test_detect_asrep_roasting_and_sysmon_lsass() -> None:
+    records = [
+        {
+            "TimeCreated": "2023-04-19T09:11:31Z",
+            "EventID": 10,
+            "Computer": "ws01.acme.skb",
+            "Channel": "Microsoft-Windows-Sysmon/Operational",
+            "TargetUserName": "SYSTEM",
+            "IpAddress": "10.0.10.254",
+            "SourceImage": "\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe",
+            "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+            "GrantedAccess": "0x1010",
+        },
+        {
+            "TimeCreated": "2023-04-19T09:18:45Z",
+            "EventID": 4768,
+            "Computer": "dc01.acme.skb",
+            "TargetUserName": "legacy_svc@ACME.SKB",
+            "TicketEncryptionType": "0x17",
+            "PreAuthType": "0",
+            "IpAddress": "10.0.30.53",
+        },
+    ]
+    events = parse_windows_json_records(records)
+    engine = DetectionEngine()
+    alerts = engine.analyze(events)
+    rule_ids = {a.rule_id for a in alerts}
+    assert "LS-RULE-009" in rule_ids  # AS-REP Roasting
+    assert "LS-RULE-010" in rule_ids  # Sysmon Event ID 10 LSASS Access
+
+
 def test_full_samples_directory_pipeline() -> None:
     samples_dir = Path(__file__).resolve().parent.parent / "samples"
     events = load_events_from_path(samples_dir)
-    assert len(events) >= 20
+    assert len(events) >= 22
 
     engine = DetectionEngine()
     alerts = engine.analyze(events)
     rule_ids = {a.rule_id for a in alerts}
 
-    # Verify all 8 core detection rules fire on the acme.skb sample bundle
+    # Verify all 10 core detection rules fire on the acme.skb sample bundle
     assert "LS-RULE-001" in rule_ids  # Web Shell
     assert "LS-RULE-002" in rule_ids  # SSH Brute-force -> login
     assert "LS-RULE-003" in rule_ids  # Windows RDP 4625 -> 4624
@@ -83,10 +114,12 @@ def test_full_samples_directory_pipeline() -> None:
     assert "LS-RULE-006" in rule_ids  # Defender 5001 / Wazuh 506
     assert "LS-RULE-007" in rule_ids  # WER AppCrash CVE-2019-0623
     assert "LS-RULE-008" in rule_ids  # Mimikatz via \\tsclient
+    assert "LS-RULE-009" in rule_ids  # AS-REP Roasting 4768 PreAuthType 0
+    assert "LS-RULE-010" in rule_ids  # Sysmon Event ID 10 LSASS Access
 
     json_rep = generate_json_report(events, alerts)
     assert json_rep["summary"]["total_alerts_triggered"] == len(alerts)
 
     html_out = generate_html_dashboard(events, alerts)
-    assert "Log Sentinel v1.2.0" in html_out
-    assert "LS-RULE-005" in html_out
+    assert "Log Sentinel v1.3.0" in html_out
+    assert "LS-RULE-010" in html_out

@@ -108,6 +108,30 @@
     "Message": "Microsoft Defender Antivirus has detected malware or potentially unwanted software: HackTool:Win32/Mimikatz.D. Path: file:_\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe"
   },
   {
+    "TimeCreated": "2023-04-19T09:11:31Z",
+    "EventID": 10,
+    "Computer": "ws01.acme.skb",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "TargetUserName": "SYSTEM",
+    "IpAddress": "10.0.10.254",
+    "SourceImage": "\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe",
+    "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+    "GrantedAccess": "0x1010",
+    "Message": "Process accessed (Sysmon Event ID 10): SourceImage: \\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe, TargetImage: C:\\Windows\\System32\\lsass.exe, GrantedAccess: 0x1010 (PROCESS_VM_READ)"
+  },
+  {
+    "TimeCreated": "2023-04-19T09:18:45Z",
+    "EventID": 4768,
+    "Computer": "dc01.acme.skb",
+    "Channel": "Security",
+    "TargetUserName": "legacy_svc@ACME.SKB",
+    "ServiceName": "krbtgt",
+    "TicketEncryptionType": "0x17",
+    "PreAuthType": "0",
+    "IpAddress": "10.0.30.53",
+    "Message": "A Kerberos authentication ticket (TGT) was requested (Event ID 4768). Account: legacy_svc@ACME.SKB, Pre-Authentication Type: 0 (None), Ticket Encryption Type: 0x17 (RC4-HMAC), Client Address: 10.0.30.53"
+  },
+  {
     "TimeCreated": "2023-04-19T09:20:00Z",
     "EventID": 4769,
     "Computer": "dc01.acme.skb",

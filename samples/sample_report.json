@@ -1,13 +1,13 @@
 {
   "tool": "Log Sentinel",
-  "version": "1.2.0",
-  "generated_at": "2026-10-10T13:55:06Z",
+  "version": "1.3.0",
+  "generated_at": "2026-10-11T18:55:41Z",
   "summary": {
-    "total_events_parsed": 34,
-    "total_alerts_triggered": 9,
+    "total_events_parsed": 36,
+    "total_alerts_triggered": 11,
     "severity_breakdown": {
-      "CRITICAL": 6,
-      "HIGH": 3,
+      "CRITICAL": 7,
+      "HIGH": 4,
       "MEDIUM": 0,
       "LOW": 0
     }
@@ -229,6 +229,52 @@
         "Isolate affected workstation and rotate all domain credentials cached in LSASS."
       ],
       "wazuh_rule_equivalent": "Wazuh Rule 62123 / Defender Malware Alert"
+    },
+    {
+      "rule_id": "LS-RULE-009",
+      "title": "Kerberos AS-REP Roasting Detected (Event ID 4768 PreAuthType 0 / RC4-HMAC)",
+      "severity": "HIGH",
+      "mitre_tactic": "Credential Access",
+      "mitre_technique": "T1558.004 (Steal or Forge Kerberos Tickets: AS-REP Roasting)",
+      "host": "dc01.acme.skb",
+      "source_ip": "10.0.30.53",
+      "target_user": "legacy_svc@ACME.SKB",
+      "timestamp_first": "2023-04-19T09:18:45Z",
+      "timestamp_last": "2023-04-19T09:18:45Z",
+      "event_count": 1,
+      "description": "Detected 1 Kerberos TGT request(s) (Event ID 4768) without pre-authentication (PreAuthType=0) using weak RC4-HMAC encryption (0x17) for account 'legacy_svc@ACME.SKB' from 10.0.30.53, indicating an AS-REP Roasting attack (e.g. GetNPUsers.py / Rubeus).",
+      "evidence": [
+        "A Kerberos authentication ticket (TGT) was requested (Event ID 4768). Account: legacy_svc@ACME.SKB, Pre-Authentication Type: 0 (None), Ticket Encryption Type: 0x17 (RC4-HMAC), Client Address: 10.0.30.53"
+      ],
+      "remediation": [
+        "Enforce Kerberos Pre-Authentication on all AD accounts (clear 'Do not require Kerberos preauthentication').",
+        "Audit domain accounts via: Get-ADUser -Filter 'DoesNotRequirePreAuth -eq $true' and rotate passwords (25+ chars).",
+        "Disable RC4-HMAC (0x17) in favor of AES256-CTS-HMAC-SHA1-96 across Active Directory."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 60116 / Custom AS-REP Roast Detection"
+    },
+    {
+      "rule_id": "LS-RULE-010",
+      "title": "Sysmon LSASS Memory Credential Dumping Detected (Sysmon Event ID 10)",
+      "severity": "CRITICAL",
+      "mitre_tactic": "Credential Access",
+      "mitre_technique": "T1003.001 (OS Credential Dumping: LSASS Memory)",
+      "host": "ws01.acme.skb",
+      "source_ip": "10.0.10.254",
+      "target_user": "SYSTEM",
+      "timestamp_first": "2023-04-19T09:11:31Z",
+      "timestamp_last": "2023-04-19T09:11:31Z",
+      "event_count": 1,
+      "description": "Sysmon Event ID 10 (ProcessAccess) recorded process '\\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe' opening a handle to C:\\Windows\\System32\\lsass.exe with GrantedAccess=0x1010 (PROCESS_VM_READ), directly confirming in-memory credential dumping (Mimikatz sekurlsa::logonpasswords).",
+      "evidence": [
+        "Process accessed (Sysmon Event ID 10): SourceImage: \\\\tsclient\\_home_kali_Documents_Brute-RDP.py_rdpshare_\\mimikatz.exe, TargetImage: C:\\Windows\\System32\\lsass.exe, GrantedAccess: 0x1010 (PROCESS_VM_READ)"
+      ],
+      "remediation": [
+        "Enable LSA Protection (RunAsPPL=1 in HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa) and Credential Guard.",
+        "Enable Microsoft Defender ASR rule 'Block credential stealing from the Windows local security authority subsystem (lsass.exe)'.",
+        "Isolate host immediately and revoke all active Kerberos TGTs / NTLM sessions cached on the endpoint."
+      ],
+      "wazuh_rule_equivalent": "Wazuh Rule 92910 (Sysmon Event 10: Process Accessed lsass.exe)"
     }
   ]
 }

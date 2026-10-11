@@ -24,6 +24,8 @@ class DetectionEngine:
         alerts.extend(self._detect_pass_the_hash(events))
         alerts.extend(self._detect_defense_evasion_and_wer(events))
         alerts.extend(self._detect_malware_and_tsclient(events))
+        alerts.extend(self._detect_asrep_roasting(events))
+        alerts.extend(self._detect_sysmon_lsass_access(events))
         return alerts
 
     def _detect_webshell_activity(self, events: List[NormalizedEvent]) -> List[Alert]:
@@ -416,3 +418,96 @@ class DetectionEngine:
                 )
             )
         return alerts
+
+    def _detect_asrep_roasting(self, events: List[NormalizedEvent]) -> List[Alert]:
+        alerts: List[Alert] = []
+        suspicious: List[NormalizedEvent] = []
+
+        for ev in events:
+            if ev.source_type == "windows_event" and ev.event_id == "4768":
+                enc = str(ev.metadata.get("TicketEncryptionType", "")).lower()
+                pre_auth = str(ev.metadata.get("PreAuthType", "")).strip()
+                if (enc in {"0x17", "23"} and pre_auth in {"0", "-", ""}) or (
+                    "0x17" in ev.raw_message.lower() and "preauthtype: 0" in ev.raw_message.lower()
+                ):
+                    suspicious.append(ev)
+
+        if suspicious:
+            first = suspicious[0]
+            target_acct = str(first.metadata.get("TargetUserName", first.user or "unknown"))
+            alerts.append(
+                Alert(
+                    rule_id="LS-RULE-009",
+                    title="Kerberos AS-REP Roasting Detected (Event ID 4768 PreAuthType 0 / RC4-HMAC)",
+                    severity="HIGH",
+                    mitre_tactic="Credential Access",
+                    mitre_technique="T1558.004 (Steal or Forge Kerberos Tickets: AS-REP Roasting)",
+                    host=first.host,
+                    source_ip=first.source_ip or "unknown",
+                    target_user=target_acct,
+                    timestamp_first=suspicious[0].timestamp,
+                    timestamp_last=suspicious[-1].timestamp,
+                    event_count=len(suspicious),
+                    description=(
+                        f"Detected {len(suspicious)} Kerberos TGT request(s) (Event ID 4768) without pre-authentication "
+                        f"(PreAuthType=0) using weak RC4-HMAC encryption (0x17) for account '{target_acct}' "
+                        f"from {first.source_ip}, indicating an AS-REP Roasting attack (e.g. GetNPUsers.py / Rubeus)."
+                    ),
+                    evidence=[e.raw_message for e in suspicious[:4]],
+                    remediation=[
+                        "Enforce Kerberos Pre-Authentication on all AD accounts (clear 'Do not require Kerberos preauthentication').",
+                        "Audit domain accounts via: Get-ADUser -Filter 'DoesNotRequirePreAuth -eq $true' and rotate passwords (25+ chars).",
+                        "Disable RC4-HMAC (0x17) in favor of AES256-CTS-HMAC-SHA1-96 across Active Directory.",
+                    ],
+                    wazuh_rule_equivalent="Wazuh Rule 60116 / Custom AS-REP Roast Detection",
+                )
+            )
+        return alerts
+
+    def _detect_sysmon_lsass_access(self, events: List[NormalizedEvent]) -> List[Alert]:
+        alerts: List[Alert] = []
+        lsass_hits: List[NormalizedEvent] = []
+        suspicious_masks = {"0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff", "0x01000", "0x1038"}
+
+        for ev in events:
+            if ev.source_type == "windows_event" and ev.event_id == "10":
+                target_img = str(ev.metadata.get("TargetImage", "")).lower()
+                granted = str(ev.metadata.get("GrantedAccess", "")).lower()
+                raw_lower = ev.raw_message.lower()
+                if "lsass.exe" in target_img or "lsass.exe" in raw_lower:
+                    if not granted or granted in suspicious_masks or any(m in raw_lower for m in suspicious_masks):
+                        lsass_hits.append(ev)
+
+        if lsass_hits:
+            first = lsass_hits[0]
+            src_img = str(first.metadata.get("SourceImage", "unknown_process"))
+            granted_mask = str(first.metadata.get("GrantedAccess", "0x1010"))
+            alerts.append(
+                Alert(
+                    rule_id="LS-RULE-010",
+                    title="Sysmon LSASS Memory Credential Dumping Detected (Sysmon Event ID 10)",
+                    severity="CRITICAL",
+                    mitre_tactic="Credential Access",
+                    mitre_technique="T1003.001 (OS Credential Dumping: LSASS Memory)",
+                    host=first.host,
+                    source_ip=first.source_ip or "local",
+                    target_user=first.user or "SYSTEM",
+                    timestamp_first=lsass_hits[0].timestamp,
+                    timestamp_last=lsass_hits[-1].timestamp,
+                    event_count=len(lsass_hits),
+                    description=(
+                        f"Sysmon Event ID 10 (ProcessAccess) recorded process '{src_img}' opening a handle "
+                        f"to C:\\Windows\\System32\\lsass.exe with GrantedAccess={granted_mask} "
+                        "(PROCESS_VM_READ), directly confirming in-memory credential dumping (Mimikatz sekurlsa::logonpasswords)."
+                    ),
+                    evidence=[e.raw_message for e in lsass_hits[:4]],
+                    remediation=[
+                        "Enable LSA Protection (RunAsPPL=1 in HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa) and Credential Guard.",
+                        "Enable Microsoft Defender ASR rule 'Block credential stealing from the Windows local security authority subsystem (lsass.exe)'.",
+                        "Isolate host immediately and revoke all active Kerberos TGTs / NTLM sessions cached on the endpoint.",
+                    ],
+                    wazuh_rule_equivalent="Wazuh Rule 92910 (Sysmon Event 10: Process Accessed lsass.exe)",
+                )
+            )
+        return alerts
+

@@ -163,33 +163,32 @@
   <div class="container">
     <header>
       <div>
-        <h1>🔍 Log Sentinel v1.2.0</h1>
+        <h1>🔍 Log Sentinel v1.3.0</h1>
         <p class="subtitle">Zero-Dependency Python Threat Detection &amp; SOC L1/L2 Incident Triage Engine &bull; Case Study: <code>acme.skb</code> Compromise</p>
       </div>
       <div class="links">
         <a href="https://voobrazhenie21-lab.github.io/">🏠 Сайт-визитка / Portfolio</a>
         <a href="https://github.com/Voobrazhenie21-lab/log-sentinel">GitHub Repo</a>
-        <a href="https://voobrazhenie21-lab.github.io/blue-team-incident-investigation/">Full DFIR Report</a>
-        <a href="https://voobrazhenie21-lab.github.io/pipeshield/">PipeShield v1.1</a>
+        <a href="https://github.com/Voobrazhenie21-lab/blue-team-incident-investigation">Full DFIR Report</a>
       </div>
     </header>
 
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Normalized Events Parsed</div>
-        <div class="stat-value val-accent">34</div>
+        <div class="stat-value val-accent">36</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Correlated SOC Alerts</div>
-        <div class="stat-value val-ok">9</div>
+        <div class="stat-value val-ok">11</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Critical Severity</div>
-        <div class="stat-value val-crit">6</div>
+        <div class="stat-value val-crit">7</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">High Severity</div>
-        <div class="stat-value val-high">3</div>
+        <div class="stat-value val-high">4</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Monitored Hosts</div>
@@ -198,9 +197,9 @@
     </div>
 
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterAlerts('ALL', this)">All Alerts (9)</button>
-      <button class="filter-btn" onclick="filterAlerts('CRITICAL', this)">Critical (6)</button>
-      <button class="filter-btn" onclick="filterAlerts('HIGH', this)">High (3)</button>
+      <button class="filter-btn active" onclick="filterAlerts('ALL', this)">All Alerts (11)</button>
+      <button class="filter-btn" onclick="filterAlerts('CRITICAL', this)">Critical (7)</button>
+      <button class="filter-btn" onclick="filterAlerts('HIGH', this)">High (4)</button>
     </div>
 
     <div id="alerts-container">
@@ -470,6 +469,66 @@
                   <ul class="evidence-list"><li><code>Microsoft Defender Antivirus has detected malware: Trojan:Win32/Sabsik.TE.A!ml. Path: file:_C:\Users\Public\Documents\CVEs\cve-2019-1458.exe</code></li><li><code>Microsoft Defender Antivirus has detected malware or potentially unwanted software: HackTool:Win32/Mimikatz.D. Path: file:_\\tsclient\_home_kali_Documents_Brute-RDP.py_rdpshare_\mimikatz.exe</code></li></ul>
                   <h4>SOC L1/L2 Remediation Playbook:</h4>
                   <ul class="rem-list"><li>Disable RDP Drive Redirection via GPO (Do not allow drive redirection).</li><li>Isolate affected workstation and rotate all domain credentials cached in LSASS.</li></ul>
+                </div>
+              </details>
+            </div>
+            
+
+            <div class="alert-card" data-severity="HIGH">
+              <div class="alert-header">
+                <div>
+                  <span class="rule-id">LS-RULE-009</span>
+                  <span class="badge badge-high">HIGH</span>
+                  <span class="wazuh-tag">Wazuh Rule 60116 / Custom AS-REP Roast Detection</span>
+                </div>
+                <span class="time-range">2023-04-19T09:18:45Z &rarr; 2023-04-19T09:18:45Z</span>
+              </div>
+              <h3>Kerberos AS-REP Roasting Detected (Event ID 4768 PreAuthType 0 / RC4-HMAC)</h3>
+              <p class="desc">Detected 1 Kerberos TGT request(s) (Event ID 4768) without pre-authentication (PreAuthType=0) using weak RC4-HMAC encryption (0x17) for account &#x27;legacy_svc@ACME.SKB&#x27; from 10.0.30.53, indicating an AS-REP Roasting attack (e.g. GetNPUsers.py / Rubeus).</p>
+              <div class="meta-grid">
+                <div><strong>Affected Host:</strong> <code>dc01.acme.skb</code></div>
+                <div><strong>Source IP:</strong> <code>10.0.30.53</code></div>
+                <div><strong>Target Account:</strong> <code>legacy_svc@ACME.SKB</code></div>
+                <div><strong>Correlated Events:</strong> <code>1</code></div>
+                <div class="span-2"><strong>MITRE ATT&amp;CK:</strong> <span class="mitre">Credential Access &bull; T1558.004 (Steal or Forge Kerberos Tickets: AS-REP Roasting)</span></div>
+              </div>
+              <details>
+                <summary>📂 View Forensic Log Evidence (1 samples) &amp; Remediation Playbook</summary>
+                <div class="details-body">
+                  <h4>Forensic Log Evidence:</h4>
+                  <ul class="evidence-list"><li><code>A Kerberos authentication ticket (TGT) was requested (Event ID 4768). Account: legacy_svc@ACME.SKB, Pre-Authentication Type: 0 (None), Ticket Encryption Type: 0x17 (RC4-HMAC), Client Address: 10.0.30.53</code></li></ul>
+                  <h4>SOC L1/L2 Remediation Playbook:</h4>
+                  <ul class="rem-list"><li>Enforce Kerberos Pre-Authentication on all AD accounts (clear &#x27;Do not require Kerberos preauthentication&#x27;).</li><li>Audit domain accounts via: Get-ADUser -Filter &#x27;DoesNotRequirePreAuth -eq $true&#x27; and rotate passwords (25+ chars).</li><li>Disable RC4-HMAC (0x17) in favor of AES256-CTS-HMAC-SHA1-96 across Active Directory.</li></ul>
+                </div>
+              </details>
+            </div>
+            
+
+            <div class="alert-card" data-severity="CRITICAL">
+              <div class="alert-header">
+                <div>
+                  <span class="rule-id">LS-RULE-010</span>
+                  <span class="badge badge-critical">CRITICAL</span>
+                  <span class="wazuh-tag">Wazuh Rule 92910 (Sysmon Event 10: Process Accessed lsass.exe)</span>
+                </div>
+                <span class="time-range">2023-04-19T09:11:31Z &rarr; 2023-04-19T09:11:31Z</span>
+              </div>
+              <h3>Sysmon LSASS Memory Credential Dumping Detected (Sysmon Event ID 10)</h3>
+              <p class="desc">Sysmon Event ID 10 (ProcessAccess) recorded process &#x27;\\tsclient\_home_kali_Documents_Brute-RDP.py_rdpshare_\mimikatz.exe&#x27; opening a handle to C:\Windows\System32\lsass.exe with GrantedAccess=0x1010 (PROCESS_VM_READ), directly confirming in-memory credential dumping (Mimikatz sekurlsa::logonpasswords).</p>
+              <div class="meta-grid">
+                <div><strong>Affected Host:</strong> <code>ws01.acme.skb</code></div>
+                <div><strong>Source IP:</strong> <code>10.0.10.254</code></div>
+                <div><strong>Target Account:</strong> <code>SYSTEM</code></div>
+                <div><strong>Correlated Events:</strong> <code>1</code></div>
+                <div class="span-2"><strong>MITRE ATT&amp;CK:</strong> <span class="mitre">Credential Access &bull; T1003.001 (OS Credential Dumping: LSASS Memory)</span></div>
+              </div>
+              <details>
+                <summary>📂 View Forensic Log Evidence (1 samples) &amp; Remediation Playbook</summary>
+                <div class="details-body">
+                  <h4>Forensic Log Evidence:</h4>
+                  <ul class="evidence-list"><li><code>Process accessed (Sysmon Event ID 10): SourceImage: \\tsclient\_home_kali_Documents_Brute-RDP.py_rdpshare_\mimikatz.exe, TargetImage: C:\Windows\System32\lsass.exe, GrantedAccess: 0x1010 (PROCESS_VM_READ)</code></li></ul>
+                  <h4>SOC L1/L2 Remediation Playbook:</h4>
+                  <ul class="rem-list"><li>Enable LSA Protection (RunAsPPL=1 in HKLM\SYSTEM\CurrentControlSet\Control\Lsa) and Credential Guard.</li><li>Enable Microsoft Defender ASR rule &#x27;Block credential stealing from the Windows local security authority subsystem (lsass.exe)&#x27;.</li><li>Isolate host immediately and revoke all active Kerberos TGTs / NTLM sessions cached on the endpoint.</li></ul>
                 </div>
               </details>
             </div>

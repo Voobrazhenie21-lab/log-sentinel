@@ -16,7 +16,7 @@ def generate_json_report(events: List[NormalizedEvent], alerts: List[Alert]) -> 
 
     return {
         "tool": "Log Sentinel",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "summary": {
             "total_events_parsed": len(events),
@@ -31,7 +31,7 @@ def format_console_summary(events: List[NormalizedEvent], alerts: List[Alert]) -
     """Render a clean CLI triage summary."""
     lines = [
         "=" * 78,
-        "🔍 LOG SENTINEL v1.2.0 — SOC L1/L2 THREAT DETECTION & TRIAGE REPORT",
+        "🔍 LOG SENTINEL v1.3.0 — SOC L1/L2 THREAT DETECTION & TRIAGE REPORT",
         "=" * 78,
         f"Total Normalized Events Parsed : {len(events)}",
         f"Total Correlated Alerts Fired  : {len(alerts)}",
@@ -264,10 +264,11 @@ def generate_html_dashboard(events: List[NormalizedEvent], alerts: List[Alert]) 
   <div class="container">
     <header>
       <div>
-        <h1>🔍 Log Sentinel v1.2.0</h1>
+        <h1>🔍 Log Sentinel v1.3.0</h1>
         <p class="subtitle">Zero-Dependency Python Threat Detection &amp; SOC L1/L2 Incident Triage Engine &bull; Case Study: <code>acme.skb</code> Compromise</p>
       </div>
       <div class="links">
+        <a href="https://voobrazhenie21-lab.github.io/">🏠 Сайт-визитка / Portfolio</a>
         <a href="https://github.com/Voobrazhenie21-lab/log-sentinel">GitHub Repo</a>
         <a href="https://github.com/Voobrazhenie21-lab/blue-team-incident-investigation">Full DFIR Report</a>
       </div>
